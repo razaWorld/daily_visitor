@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import LandingScreen from "../(auth)/landing/page";
-import LoginPage from "../(auth)/login/page";
 import ResidentAuth from "../(auth)/register/page";
 import ResidentMapDemo from "../components/global/myMap/page";
+import VisitorAuth from "../(auth)/login/page";
 
 export default function Home() {
   const [page, setPage] = useState<"landing" | "login" | "register" | "map">("landing");
@@ -17,7 +17,7 @@ export default function Home() {
           onSelectResident={() => setPage("register")}
         />
       )}
-      {page === "login" && <LoginPage />}
+      {page === "login" && <VisitorAuth onLogin={() => setPage("map")} onBack={() => setPage("landing")} />}
       {page === "register" && <ResidentAuth onLogin={() => setPage("map")} onBack={() => setPage("landing")} />}
       {page === "map" && <ResidentMapDemo />}
     </div>
