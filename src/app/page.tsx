@@ -1,11 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import LandingScreen from "../(auth)/landing/page";
-import ResidentAuth from "../(auth)/register/page";
 import ResidentMapDemo from "../components/global/myMap/page";
-import VisitorAuth from "../(auth)/login/page";
-
+import {VisitorAuth,ResidentAuth,LandingScreen} from "../(auth)/index";
 export default function Home() {
   const [page, setPage] = useState<"landing" | "login" | "register" | "map">("landing");
 
