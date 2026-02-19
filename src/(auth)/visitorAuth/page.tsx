@@ -114,7 +114,7 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
           <div className="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-3 shadow-md">
             <ShieldCheck className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-1">{isLogin ? "Welcome Back" : "Join as Visitor"}</h1>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{isLogin ? "Welcome Visitor!" : "Join as Visitor"}</h1>
           <p className="text-gray-500 text-sm">
             {isLogin
               ? "Sign in to manage your daily tasks."
