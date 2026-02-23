@@ -2,45 +2,122 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import Input from "../../components/ui/Input";
+/* ---------------- TYPES ---------------- */
+
+type ViewType = "login" | "signup" | "map";
 
 interface VisitorAuthProps {
   onLogin: () => void;
   onBack: () => void;
 }
 
-type ViewType = "login" | "signup" | "map";
+interface FormData {
+  email: string;
+  password: string;
+  name: string;
+  profession: string;
+}
+
+/* ---------------- DUMMY DATA ---------------- */
+
+const professions = [
+  "Milk Delivery",
+  "House Cleaning",
+  "Car Wash",
+  "Plumbing",
+  "Electrician",
+  "Gardening",
+];
+
+/* ---------------- UI COMPONENTS ---------------- */
+
+
+
+
+
+/* ---------------- MAIN COMPONENT ---------------- */
 
 export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
   const [view, setView] = useState<ViewType>("login");
+
+  const [form, setForm] = useState<FormData>({
+    email: "",
+    password: "",
+    name: "",
+    profession: professions[0],
+  });
+
   const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+
+  /* ---------------- HANDLERS ---------------- */
+
+  const updateField = (key: keyof FormData, value: string) => {
+    setForm({ ...form, [key]: value });
+  };
+
+  const validateLogin = () => {
+    if (!form.email || !form.password) {
+      alert("Please enter email and password");
+      return false;
+    }
+    return true;
+  };
+
+  const validateSignup = () => {
+    if (!form.email || !form.password || !form.name) {
+      alert("All fields are required");
+      return false;
+    }
+    return true;
+  };
+
+  /* ---------------- MAP ---------------- */
 
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setPoints([...points, { x: e.clientX - rect.left, y: e.clientY - rect.top }]);
+
+    setPoints([
+      ...points,
+      {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      },
+    ]);
   };
 
-  const PolygonOverlay = points.length < 3 ? null : (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none">
-      <path
-        d={points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z"}
-        fill="rgba(59,130,246,0.3)"
-        stroke="#2563EB"
-        strokeWidth="2"
-      />
-    </svg>
-  );
+  const PolygonOverlay =
+    points.length < 3 ? null : (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+        <path
+          d={points
+            .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
+            .join(" ") + " Z"}
+          fill="rgba(59,130,246,0.3)"
+          stroke="#2563EB"
+          strokeWidth="2"
+        />
+      </svg>
+    );
 
-  // ===== MAP VIEW =====
+  /* ---------------- MAP VIEW ---------------- */
+
   if (view === "map")
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
         <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="p-4 bg-white border-b flex items-center gap-3">
-            <button onClick={() => setView("signup")} className="p-2 hover:bg-slate-100 rounded-full">
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
+          <div className="p-4 border-b flex items-center gap-3">
+            <button
+              onClick={() => setView("signup")}
+              className="p-2 hover:bg-slate-100 rounded-full"
+            >
+              <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-bold flex items-center gap-2">
+
+            <h1 className="font-bold flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-blue-600" />
               Define Secure Work Area
             </h1>
@@ -48,14 +125,10 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
 
           {/* Map */}
           <div
-            className="relative bg-slate-200 cursor-crosshair"
             onClick={handleMapClick}
-            style={{ minHeight: "300px" }}
+            className="relative bg-slate-200 cursor-crosshair"
+            style={{ minHeight: 300 }}
           >
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{ backgroundImage: "radial-gradient(#64748b 1px, transparent 1px)", backgroundSize: "20px 20px" }}
-            />
             {points.map((p, i) => (
               <div
                 key={i}
@@ -63,104 +136,146 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
                 style={{ left: p.x, top: p.y }}
               />
             ))}
+
             {PolygonOverlay}
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-white">
-            <div className="flex justify-between mb-4 text-sm text-slate-600">
+          <div className="p-4 border-t">
+            <div className="flex justify-between text-sm mb-3">
               <span>{points.length} points selected</span>
-              <button onClick={() => setPoints([])} className="text-red-500 hover:text-red-600">
+
+              <button
+                onClick={() => setPoints([])}
+                className="text-red-500"
+              >
                 Clear
               </button>
             </div>
-            <button
-              onClick={onLogin}
+
+            <Button
+              title="Complete Registration"
               disabled={points.length < 3}
-              className={`w-full py-3 rounded-lg text-white font-semibold transition-all ${
-                points.length >= 3 ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-300 cursor-not-allowed"
-              }`}
-            >
-              Complete Registration
-            </button>
+              onClick={() => {
+                if (points.length < 3) {
+                  alert("Please select at least 3 points");
+                  return;
+                }
+
+                alert("Registration Completed!");
+                onLogin();
+              }}
+            />
           </div>
         </div>
       </div>
     );
 
-  // ===== LOGIN / SIGNUP =====
-  const isLogin = view === "login";
+  /* ---------------- LOGIN / SIGNUP ---------------- */
 
-  const AuthInput = ({ label, ...props }: any) => (
-    <div className="space-y-1">
-      <label className="text-gray-700 font-medium text-sm">{label}</label>
-      <input
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        {...props}
-      />
-    </div>
-  );
+  const isLogin = view === "login";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        {/* Back Button */}
-        <button onClick={onBack} className="mb-4 p-2 hover:bg-gray-100 rounded-full">
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+      <Card>
+        {/* Back */}
+        <button
+          onClick={onBack}
+          className="mb-4 p-2 hover:bg-gray-100 rounded-full"
+        >
+          <ArrowLeft className="w-5 h-5" />
         </button>
 
-        {/* Logo + Title */}
-        <div className="mb-6 text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-3 shadow-md">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-3">
             <ShieldCheck className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-1">{isLogin ? "Welcome Visitor!" : "Join as Visitor"}</h1>
-          <p className="text-gray-500 text-sm">
+
+          <h1 className="text-xl font-bold">
+            {isLogin ? "Welcome Visitor!" : "Join as Visitor"}
+          </h1>
+
+          <p className="text-sm text-gray-500">
             {isLogin
-              ? "Sign in to manage your daily tasks."
-              : "Create an account to start accepting jobs securely."}
+              ? "Sign in to manage your work."
+              : "Create an account to start accepting jobs."}
           </p>
         </div>
 
         {/* Form */}
         <div className="space-y-4">
-          <AuthInput label="Email" type="email" placeholder="Enter your email" />
-          <AuthInput label="Password" type="password" placeholder="••••••••" />
+          <Input
+            label="Email"
+            value={form.email}
+            onChange={(e: any) => updateField("email", e.target.value)}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={(e: any) => updateField("password", e.target.value)}
+          />
+
           {!isLogin && (
             <>
-              <AuthInput label="Full Name" placeholder="Ali Jahanzaib" />
-              <div className="space-y-1">
-                <label className="text-gray-700 font-medium text-sm">Profession (Single Service)</label>
-                <select className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  {["Milk Delivery", "House Cleaning", "Car Wash", "Plumbing", "Electrician", "Gardening"].map(
-                    (p) => (
-                      <option key={p}>{p}</option>
-                    )
-                  )}
+              <Input
+                label="Full Name"
+                value={form.name}
+                onChange={(e: any) => updateField("name", e.target.value)}
+              />
+
+              <div>
+                <label className="text-sm font-medium">
+                  Profession
+                </label>
+
+                <select
+                  className="w-full border rounded-md px-3 py-2"
+                  value={form.profession}
+                  onChange={(e) =>
+                    updateField("profession", e.target.value)
+                  }
+                >
+                  {professions.map((p) => (
+                    <option key={p}>{p}</option>
+                  ))}
                 </select>
-                <p className="text-xs text-slate-500">You can only select one active profession.</p>
               </div>
             </>
           )}
 
-          <button
-            onClick={() => (isLogin ? onLogin() : setView("map"))}
-            className="w-full py-2 mt-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-all"
-          >
-            {isLogin ? "Sign In" : "Continue"}
-          </button>
+          <Button
+            title={isLogin ? "Sign In" : "Continue"}
+            onClick={() => {
+              if (isLogin) {
+                if (!validateLogin()) return;
 
-          <div className="mt-4 text-center text-sm text-gray-500">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+                alert("Login Success (Dummy)");
+                onLogin();
+              } else {
+                if (!validateSignup()) return;
+
+                setView("map");
+              }
+            }}
+          />
+
+          <div className="text-center text-sm text-gray-500">
+            {isLogin
+              ? "Don't have an account?"
+              : "Already have an account?"}
+
             <button
               onClick={() => setView(isLogin ? "signup" : "login")}
-              className="text-blue-600 font-semibold hover:underline"
+              className="text-blue-600 ml-1"
             >
               {isLogin ? "Sign Up" : "Log In"}
             </button>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

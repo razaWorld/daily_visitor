@@ -1,3 +1,4 @@
+// src/components/global/myMap/ResidentMapCardInner.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -22,13 +23,14 @@ const currentLocationIcon = new Icon({
   iconAnchor: [15, 30],
 });
 
+// Location type
 interface Location {
   lat: number;
   lng: number;
   address?: string;
 }
 
-// Component to handle map clicks and marker
+// Map click component
 interface MyMapProps {
   location: Location | null;
   setLocation: React.Dispatch<React.SetStateAction<Location | null>>;
@@ -41,7 +43,6 @@ const MyMap: React.FC<MyMapProps> = ({ location, setLocation }) => {
     },
   });
 
-  // Fetch address from coordinates
   const fetchAddress = async (lat: number, lng: number) => {
     try {
       const res = await fetch(
@@ -49,7 +50,7 @@ const MyMap: React.FC<MyMapProps> = ({ location, setLocation }) => {
       );
       const data = await res.json();
       setLocation({ lat, lng, address: data.display_name });
-    } catch (err) {
+    } catch {
       setLocation({ lat, lng, address: "Address not found" });
     }
   };
@@ -57,7 +58,8 @@ const MyMap: React.FC<MyMapProps> = ({ location, setLocation }) => {
   return location ? <Marker position={[location.lat, location.lng]} /> : null;
 };
 
-export default function ResidentMapCard() {
+// Main inner map card
+export default function ResidentMapCardInner() {
   const [location, setLocation] = useState<Location | null>(null);
   const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
   const [search, setSearch] = useState("");
@@ -74,7 +76,6 @@ export default function ResidentMapCard() {
     );
   }, []);
 
-  // Fetch address function
   const fetchAddress = async (lat: number, lng: number) => {
     try {
       const res = await fetch(
@@ -82,12 +83,11 @@ export default function ResidentMapCard() {
       );
       const data = await res.json();
       setLocation({ lat, lng, address: data.display_name });
-    } catch (err) {
+    } catch {
       setLocation({ lat, lng, address: "Address not found" });
     }
   };
 
-  // Search location by name
   const searchLocation = async () => {
     if (!search) return;
     try {
@@ -103,8 +103,7 @@ export default function ResidentMapCard() {
       } else {
         alert("Location not found");
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
       alert("Error fetching location");
     }
   };
@@ -153,7 +152,6 @@ export default function ResidentMapCard() {
               attribution="&copy; OpenStreetMap contributors"
             />
 
-            {/* Current Location Marker */}
             {currentLocation && (
               <Marker
                 position={[currentLocation.lat, currentLocation.lng]}
@@ -161,7 +159,6 @@ export default function ResidentMapCard() {
               />
             )}
 
-            {/* Selected Location Marker */}
             <MyMap location={location} setLocation={setLocation} />
           </MapContainer>
 
