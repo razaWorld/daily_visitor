@@ -2,17 +2,17 @@
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-
+import MapComponent from "@/components/global/myMap/MapComponent";
 import {
   VisitorAuth,
   ResidentAuth,
   LandingScreen,
 } from "../(auth)/index";
 
-// const ResidentMapDemo = dynamic(
-//   () => import("../../components/global/myMap/MapComponent.tsx"),
-//   { ssr: false }
-// );
+const ResidentMapDemo = dynamic(
+  () => import("../components/global/myMap/MapComponent"),
+  { ssr: false }
+);
 
 export default function Home() {
   const [page, setPage] = useState<
@@ -42,7 +42,7 @@ export default function Home() {
         />
       )}
 
-      {/* {page === "map" && <ResidentMapDemo />} */}
+      {page === "map" && <ResidentMapDemo />}
     </div>
   );
 }

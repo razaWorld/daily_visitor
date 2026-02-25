@@ -8,11 +8,11 @@ import VisitorHome from "./home";
 import VisitorCalendar from "./calender";
 import { VisitorServices } from "./services";
 
-// // ✅ USE ALIAS (BEST METHOD)
-// const ResidentMapCardInner = dynamic(
-//   () => import("./../components/global/myMap/MapComponent"),
-//   { ssr: false }
-// );
+
+const ResidentMapCardInner = dynamic(
+  () => import("../../components/global/myMap/MapComponent"),
+  { ssr: false }
+);
 
 export default function BottomNavbarVisitor() {
   const [activeTab, setActiveTab] = useState<
@@ -25,7 +25,7 @@ export default function BottomNavbarVisitor() {
         {activeTab === "home" && <VisitorHome setActiveTab={setActiveTab} />}
         {activeTab === "calender" && <VisitorCalendar />}
         {activeTab === "services" && <VisitorServices />}
-        {/* {activeTab === "map" && <ResidentMapCardInner />} */}
+        {activeTab === "map" && <ResidentMapCardInner />}
         {activeTab === "notifications" && <VisitorNotifications />}
       </div>
 
