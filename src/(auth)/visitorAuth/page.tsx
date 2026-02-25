@@ -5,13 +5,15 @@ import { ArrowLeft, ShieldCheck } from "lucide-react";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
+import VisitorHome from "../../dashboard/visitor/home";
+import BottomNavbarVisitor from "../../dashboard/visitor/page";
 /* ---------------- TYPES ---------------- */
 
-type ViewType = "login" | "signup" | "map";
+type ViewType = "login" | "signup" | "map" | "home";
 
 interface VisitorAuthProps {
-  onLogin: () => void;
-  onBack: () => void;
+  onLogin?: () => void;
+  onBack?: () => void;
 }
 
 interface FormData {
@@ -19,6 +21,11 @@ interface FormData {
   password: string;
   name: string;
   profession: string;
+}
+
+interface Point {
+  x: number;
+  y: number;
 }
 
 /* ---------------- DUMMY DATA ---------------- */
@@ -32,15 +39,12 @@ const professions = [
   "Gardening",
 ];
 
-/* ---------------- UI COMPONENTS ---------------- */
-
-
-
-
-
 /* ---------------- MAIN COMPONENT ---------------- */
 
-export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
+export default function VisitorAuth({
+  onLogin,
+  onBack,
+}: VisitorAuthProps) {
   const [view, setView] = useState<ViewType>("login");
 
   const [form, setForm] = useState<FormData>({
@@ -50,11 +54,14 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
     profession: professions[0],
   });
 
-  const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+  const [points, setPoints] = useState<Point[]>([]);
 
   /* ---------------- HANDLERS ---------------- */
 
-  const updateField = (key: keyof FormData, value: string) => {
+  const updateField = (
+    key: keyof FormData,
+    value: string
+  ) => {
     setForm({ ...form, [key]: value });
   };
 
@@ -76,8 +83,11 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
 
   /* ---------------- MAP ---------------- */
 
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
+  const handleMapClick = (
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
+    const rect =
+      e.currentTarget.getBoundingClientRect();
 
     setPoints([
       ...points,
@@ -92,15 +102,26 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
     points.length < 3 ? null : (
       <svg className="absolute inset-0 w-full h-full pointer-events-none">
         <path
-          d={points
-            .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-            .join(" ") + " Z"}
+          d={
+            points
+              .map(
+                (p, i) =>
+                  `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`
+              )
+              .join(" ") + " Z"
+          }
           fill="rgba(59,130,246,0.3)"
           stroke="#2563EB"
           strokeWidth="2"
         />
       </svg>
     );
+
+  /* ---------------- HOME VIEW ---------------- */
+
+  if (view === "home") {
+    return <BottomNavbarVisitor />;
+  }
 
   /* ---------------- MAP VIEW ---------------- */
 
@@ -133,7 +154,10 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
               <div
                 key={i}
                 className="absolute w-4 h-4 bg-blue-600 rounded-full border-2 border-white -translate-x-1/2 -translate-y-1/2"
-                style={{ left: p.x, top: p.y }}
+                style={{
+                  left: p.x,
+                  top: p.y,
+                }}
               />
             ))}
 
@@ -143,7 +167,9 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
           {/* Footer */}
           <div className="p-4 border-t">
             <div className="flex justify-between text-sm mb-3">
-              <span>{points.length} points selected</span>
+              <span>
+                {points.length} points selected
+              </span>
 
               <button
                 onClick={() => setPoints([])}
@@ -158,12 +184,14 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
               disabled={points.length < 3}
               onClick={() => {
                 if (points.length < 3) {
-                  alert("Please select at least 3 points");
+                  alert(
+                    "Please select at least 3 points"
+                  );
                   return;
                 }
 
                 alert("Registration Completed!");
-                onLogin();
+                setView("home"); // GO TO HOME
               }}
             />
           </div>
@@ -180,7 +208,9 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
       <Card>
         {/* Back */}
         <button
-          onClick={onBack}
+          onClick={() =>
+            onBack ? onBack() : setView("login")
+          }
           className="mb-4 p-2 hover:bg-gray-100 rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -193,7 +223,9 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
           </div>
 
           <h1 className="text-xl font-bold">
-            {isLogin ? "Welcome Visitor!" : "Join as Visitor"}
+            {isLogin
+              ? "Welcome Visitor!"
+              : "Join as Visitor"}
           </h1>
 
           <p className="text-sm text-gray-500">
@@ -208,14 +240,24 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
           <Input
             label="Email"
             value={form.email}
-            onChange={(e: any) => updateField("email", e.target.value)}
+            onChange={(e: any) =>
+              updateField(
+                "email",
+                e.target.value
+              )
+            }
           />
 
           <Input
             label="Password"
             type="password"
             value={form.password}
-            onChange={(e: any) => updateField("password", e.target.value)}
+            onChange={(e: any) =>
+              updateField(
+                "password",
+                e.target.value
+              )
+            }
           />
 
           {!isLogin && (
@@ -223,7 +265,12 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
               <Input
                 label="Full Name"
                 value={form.name}
-                onChange={(e: any) => updateField("name", e.target.value)}
+                onChange={(e: any) =>
+                  updateField(
+                    "name",
+                    e.target.value
+                  )
+                }
               />
 
               <div>
@@ -235,11 +282,16 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
                   className="w-full border rounded-md px-3 py-2"
                   value={form.profession}
                   onChange={(e) =>
-                    updateField("profession", e.target.value)
+                    updateField(
+                      "profession",
+                      e.target.value
+                    )
                   }
                 >
                   {professions.map((p) => (
-                    <option key={p}>{p}</option>
+                    <option key={p}>
+                      {p}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -247,15 +299,18 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
           )}
 
           <Button
-            title={isLogin ? "Sign In" : "Continue"}
+            title={
+              isLogin ? "Sign In" : "Continue"
+            }
             onClick={() => {
               if (isLogin) {
                 if (!validateLogin()) return;
 
-                alert("Login Success (Dummy)");
-                onLogin();
+                alert("Login Success!");
+                setView("home"); // SHOW VisitorHome
               } else {
-                if (!validateSignup()) return;
+                if (!validateSignup())
+                  return;
 
                 setView("map");
               }
@@ -268,10 +323,18 @@ export default function VisitorAuth({ onLogin, onBack }: VisitorAuthProps) {
               : "Already have an account?"}
 
             <button
-              onClick={() => setView(isLogin ? "signup" : "login")}
+              onClick={() =>
+                setView(
+                  isLogin
+                    ? "signup"
+                    : "login"
+                )
+              }
               className="text-blue-600 ml-1"
             >
-              {isLogin ? "Sign Up" : "Log In"}
+              {isLogin
+                ? "Sign Up"
+                : "Log In"}
             </button>
           </div>
         </div>
